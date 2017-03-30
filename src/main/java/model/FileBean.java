@@ -53,30 +53,4 @@ public class FileBean {
 	public void setFileHash(String fileHash) {
 		this.fileHash = fileHash;
 	}
-
-	/**
-	 * 重写equls方法和hashcode方法
-	 */
-	@Override
-	public int hashCode() {
-		return Integer.valueOf(fileHash);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (this == obj)
-			return true;
-		if (obj instanceof FileBean) {
-			FileBean file = (FileBean) obj;
-			if (this.fileHash.equals(file.getFileHash())) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
 }

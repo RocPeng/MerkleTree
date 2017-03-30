@@ -4,7 +4,7 @@ package dao;
 public class DaoManager {
 
 	// 静态方法创建一个UserDao
-	public static IFileDao getUserDao(){
+	public static IFileDao getFileDao(){
 		return new FileDao();
 	}
 }

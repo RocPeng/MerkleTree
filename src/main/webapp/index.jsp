@@ -12,7 +12,7 @@
 	<h3>使用一个账户名登录,该账户名将作为服务器文件的根目录使用</h3>
 	<%
 		String userPath = "";%>
-	<form action="filelist.jsp" name="userForm" method="post">
+	<form action="dologin.jsp" name="userForm" method="post">
 		<table>
 			<tr>
 				<td>用户名</td>

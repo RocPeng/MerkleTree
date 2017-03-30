@@ -6,31 +6,24 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 
 import model.FileBean;
 
 public class FileUtil {
-	public static String filesRoot = "/Users/roc_peng/Downloads/merkle/";
-	public static String userPath = "";
-	public static String merkleTreeFile = filesRoot + userPath + "merkletree.json";
-	public static String filesPath = filesRoot + userPath + "/files/";
+	public static String filesPath = "";
 
 	/**
 	 * 用户设置完路径后,生成merkle树
 	 */
 	public static void setUserPath(String path) {
-		userPath = path;
-		merkleTreeFile = filesRoot + userPath + "merkletree.json";
-		filesPath = filesRoot + userPath + "/files/";
+		filesPath = GlobalConfig.filesRoot + path + "/";
 		File fileDir = new File(filesPath);
 		if (!fileDir.exists()) {
 			// 按照指定的路径创建文件夹
@@ -63,38 +56,92 @@ public class FileUtil {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 获取某一目录下所有文件的md5 hash值,并存放在/md5/hash文件
 	 */
-	public static void getFilesHash(String filePath){
-		List<FileBean> list=new LinkedList<>();
-		list=getFilesParams(filePath);
-		writeStrToFile(filePath+"md5/hash", JSON.toJSONString(list));
+	public static void getFilesHash(String filePath) {
+		List<FileBean> list = new LinkedList<>();
+		list = getFilesParams(filePath);
+		writeStrToFile(filePath + "md5/hash", JSON.toJSONString(list));
 	}
 
 	/**
-	 * 获取某一路径下所有文件的详细信息(文件名,大小,hash值等)
+	 * hash相同也不归并
+	 * 
+	 * @return
+	 */
+	public static List<FileBean> getFiles(String filePath) {
+		List<FileBean> filesParams = new LinkedList();
+		List<String> filesPath = new ArrayList<String>();
+		filesPath = getFiles(filePath, filesPath);
+		for (String path : filesPath) {
+			FileBean fileBean = new FileBean();
+			fileBean.addFileName(path.substring(path.lastIndexOf('/') + 1));
+			fileBean.setFileSize(GetFileSize(new File(path)));
+			fileBean.setFileHash(EncryptUtil.getMD5(readFileToStr(path)));
+			filesParams.add(fileBean);
+		}
+		return filesParams;
+	}
+
+	/**
+	 * 获取某一路径下所有文件的详细信息(文件名,大小,hash值等,hash相同则归并)
 	 */
 	public static List<FileBean> getFilesParams(String filePath) {
 		List<FileBean> filesParams = new LinkedList();
 		List<String> filesPath = new ArrayList<String>();
 		filesPath = getFiles(filePath, filesPath);
 		for (String path : filesPath) {
-			FileBean fileBean=new FileBean();
-			fileBean.addFileName(path.substring(path.lastIndexOf('/')+1));
+			FileBean fileBean = new FileBean();
+			fileBean.addFileName(path.substring(path.lastIndexOf('/') + 1));
 			fileBean.setFileSize(GetFileSize(new File(path)));
 			fileBean.setFileHash(EncryptUtil.getMD5(readFileToStr(path)));
-			if(filesParams.contains(fileBean)){
-				filesParams.get(filesParams.indexOf(fileBean)).addAllFileName(fileBean.getFileName());
-			}else{
+			if (isContain(filesParams, fileBean)) {
+				getFileBean(filesParams, fileBean).addAllFileName(fileBean.getFileName());
+			} else {
 				filesParams.add(fileBean);
 			}
 		}
 		return filesParams;
 	}
-	
 
+	/**
+	 * 判断同一目录下是否有hash相同的文件
+	 */
+	public static boolean isContain(List<FileBean> list, FileBean file) {
+		for (FileBean bean : list) {
+			if (bean.getFileHash().equals(file.getFileHash()))
+				return true;
+		}
+		return false;
+	}
+
+	public static FileBean getFileBean(List<FileBean> list, FileBean file) {
+		for (FileBean bean : list) {
+			if (bean.getFileHash().equals(file.getFileHash()))
+				return bean;
+		}
+		return null;
+	}
+	
+	/**
+	 * 只获取文件名,不获取全路径
+	 */
+	public static List<String> getFileNames(String filePath, List<String> filelist) {
+		filelist=getFiles(filePath,filelist);
+		List<String> fileNames=new LinkedList<>();
+		for(String path:filelist){
+			fileNames.add(path.substring(path.lastIndexOf('/')+1));
+		}
+		Iterator<String> iterator=fileNames.iterator();
+		while(iterator.hasNext()){
+			String str=iterator.next();
+			if(str.startsWith("."))
+				iterator.remove();
+		}
+		return fileNames;
+	}
 	/**
 	 * 通过递归得到某一路径下所有的文件的名称(不包括子文件夹),分装到list里面
 	 *
@@ -121,7 +168,7 @@ public class FileUtil {
 		}
 		return filelist;
 	}
-	
+
 	/**
 	 * 通过递归得到某一路径下所有的文件的名称(包括子文件夹),分装到list里面
 	 *
@@ -187,13 +234,13 @@ public class FileUtil {
 		}
 		return size;
 	}
-	
+
 	public static void main(String[] args) {
-//		List<FileBean> list=new LinkedList<FileBean>();
-//		list=getFilesParams("/Users/roc_peng/Downloads/merkle/roc/");
-//		String tets=JSON.toJSONString(list);
-//		System.out.println(tets);
-//		writeStrToFile("/Users/roc_peng/Downloads/merkle/roc/json", tets);
+		// List<FileBean> list=new LinkedList<FileBean>();
+		// list=getFilesParams("/Users/roc_peng/Downloads/merkle/roc/");
+		// String tets=JSON.toJSONString(list);
+		// System.out.println(tets);
+		// writeStrToFile("/Users/roc_peng/Downloads/merkle/roc/json", tets);
 		getFilesHash("/Users/roc_peng/Downloads/merkle/roc/");
 	}
 }
