@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.jdt.internal.compiler.ast.ThisReference;
 
 import com.alibaba.fastjson.JSON;
 
@@ -18,11 +19,13 @@ import model.FileBean;
 
 public class FileUtil {
 	public static String filesPath = "";
+	public static String userPath = "";
 
 	/**
 	 * 用户设置完路径后,生成merkle树
 	 */
 	public static void setUserPath(String path) {
+		userPath=path;
 		filesPath = GlobalConfig.filesRoot + path + "/";
 		File fileDir = new File(filesPath);
 		if (!fileDir.exists()) {

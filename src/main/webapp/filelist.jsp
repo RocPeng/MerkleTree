@@ -14,16 +14,20 @@
 <body>
 	<h1>文件列表</h1>
 	<%
+		String userPath="";
 		request.setCharacterEncoding("UTF-8");
-		String userPath =session.getAttribute("userPath").toString();
-		FileUtil.setUserPath(userPath);
+		try {
+			userPath = session.getAttribute("userPath").toString();
+			FileUtil.setUserPath(userPath);
+		} catch (Exception e) {
+			userPath=FileUtil.userPath;
+		}
 		List<FileBean> files = new ArrayList();
 		files = FileUtil.getFiles(FileUtil.filesPath);
 		List<FileBean> filesParams = new ArrayList();
 		filesParams = FileUtil.getFilesParams(FileUtil.filesPath);
 	%>
-	<form
-		action="${pageContext.request.contextPath}/uploadHandleServlet"
+	<form action="${pageContext.request.contextPath}/uploadHandleServlet"
 		enctype="multipart/form-data" method="post">
 		上传用户：<input type="text" name="username" value="<%=userPath%>"><br />
 		上传文件1：<input type="file" name="file1"><br /> 上传文件2：<input
@@ -51,9 +55,12 @@
 			<td><%=file.getFileSize()%></td>
 			<td><%=file.getFileHash()%></td>
 			<td>
-				<!-- 操作 --> 
-				<a href="merkle.jsp?fileName=<%=file.getFileName().get(0)%>">merkle</a>&nbsp;&nbsp;
-				<a href=<%=request.getContextPath() +"/downLoadServlet?fileName="+file.getFileName().get(0)%>>下载</a>&nbsp;&nbsp;
+				<!-- 操作 --> <a
+				href="merkle.jsp?fileName=<%=file.getFileName().get(0)%>">merkle</a>&nbsp;&nbsp;
+				<a
+				href=<%=request.getContextPath() + "/downLoadTamperServlet?fileName=" + file.getFileName().get(0)%>>篡改</a>&nbsp;&nbsp;
+				<a
+				href=<%=request.getContextPath() + "/downLoadServlet?fileName=" + file.getFileName().get(0)%>>下载</a>&nbsp;&nbsp;
 				<a href="delete.jsp?fileName=<%=file.getFileName().get(0)%>">删除</a>
 			</td>
 		</tr>
@@ -86,10 +93,6 @@
 			<td><%=file.getFileName()%></td>
 			<td><%=file.getFileSize()%></td>
 			<td><%=file.getFileHash()%></td>
-			<td>
-				<!-- 操作 --> <a >下载</a>&nbsp;&nbsp;
-				<a ">删除</a>
-			</td>
 		</tr>
 		<%
 			}

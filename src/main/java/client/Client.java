@@ -24,7 +24,9 @@ public class Client {
 		if (input.equalsIgnoreCase("y")) {
 			println("请输入新的路径:");
 			clientPath = getInput();
-		}
+		}		
+		fileNames.clear();
+		merkleNames.clear();
 		fileNames = FileUtil.getFileNames(clientPath, fileNames);
 		merkleNames=FileUtil.getFileNames(clientPath + "merkle/", merkleNames);
 		println("当前路径下的所有文件:" + JSON.toJSONString(fileNames));
@@ -64,6 +66,7 @@ public class Client {
 		for (final String str : fileNames) {
 			MerkleUtil.getMerkleTree(clientPath + str);
 		}
+		merkleNames.clear();
 		merkleNames=FileUtil.getFileNames(clientPath + "merkle/", merkleNames);
 		println("merkle已生成,路径:" + clientPath + "merkle  是否查看文件(Y/N)");
 		String input = getInput();
@@ -101,6 +104,21 @@ public class Client {
 		println("是否随机修改hash值(Y/N)");
 		String input = getInput();
 		if (input.equalsIgnoreCase("n")) {
+			String result=GetRootHash.getRoothash(fileName, blockName, hash);
+			System.out.println(result);
+			Map<String,String> params=JSON.parseObject(result,Map.class);
+			String serverRoot=params.get("roothash");
+			List<Map<String, String>> clientRootData=allList.get(allList.size()-1);
+			Map<String, String> clientData=clientRootData.get(0);
+			String clientRoot=clientData.get("hash");
+			print("本地文件的merkle根:"+clientRoot);
+			if(clientRoot.equals(serverRoot)){
+				println("\t与服务端根节点相同");
+			}else{
+				println("\t与服务端根节点不同");
+			}
+		}else{
+			hash=hash.substring(1)+"a";
 			String result=GetRootHash.getRoothash(fileName, blockName, hash);
 			System.out.println(result);
 			Map<String,String> params=JSON.parseObject(result,Map.class);
