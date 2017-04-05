@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+	<display-name>Archetype Created Web Application</display-name>
+	<servlet>
+		<servlet-name>UploadHandleServlet</servlet-name>
+		<servlet-class>controller.UploadHandleServlet</servlet-class>
+	</servlet>
+	 
+	<servlet-mapping>
+		<servlet-name>UploadHandleServlet</servlet-name>
+		<url-pattern>/uploadHandleServlet</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>DataBlockServlet</servlet-name>
+		<servlet-class>controller.DataBlockServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>DataBlockServlet</servlet-name>
+		<url-pattern>/dataBlock</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>DownLoadServlet</servlet-name>
+		<servlet-class>controller.DownLoadServlet</servlet-class>
+	</servlet>
+ 
+	<servlet-mapping>
+		<servlet-name>DownLoadServlet</servlet-name>
+		<url-pattern>/downLoadServlet</url-pattern>
+	</servlet-mapping> 
+	<servlet>
+		<servlet-name>DownLoadTamperServlet</servlet-name>
+		<servlet-class>controller.DownLoadTamperServlet</servlet-class>
+	</servlet>
+ 
+	<servlet-mapping>
+		<servlet-name>DownLoadTamperServlet</servlet-name>
+		<url-pattern>/downLoadTamperServlet</url-pattern>
+	</servlet-mapping> 
+</web-app>
